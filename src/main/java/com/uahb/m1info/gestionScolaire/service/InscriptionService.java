@@ -1,8 +1,6 @@
 package com.uahb.m1info.gestionScolaire.service;
 
-import com.uahb.m1info.gestionScolaire.exception.ClasseNotFoundException;
-import com.uahb.m1info.gestionScolaire.exception.EtudiantNotFoundException;
-import com.uahb.m1info.gestionScolaire.exception.InscriptionNotFoundException;
+import com.uahb.m1info.gestionScolaire.exception.*;
 import com.uahb.m1info.gestionScolaire.model.Inscription;
 import com.uahb.m1info.gestionScolaire.repository.ClasseRepository;
 import com.uahb.m1info.gestionScolaire.repository.EtudiantRepository;
@@ -34,7 +32,7 @@ public class InscriptionService implements IInscription {
                 throw new RuntimeException("L'étudiant avec le matricule " + inscription.getEtudiant().getMatricule() + " existe déjà");
         }*/
 
-
+        //Vérification du l'age de l'etudiant
         Date taDate = inscription.getEtudiant().getDate_naissance();
         Instant instant = taDate.toInstant();
         LocalDate date = instant.atZone(ZoneId.systemDefault()).toLocalDate();
@@ -45,15 +43,15 @@ public class InscriptionService implements IInscription {
 
 
         // Vérification de l'inscription dans la même classe la même année
-        List<Inscription> existingInscriptions = inscriptionRepository.findEtudiantParClasseEtAnnee(inscription.getClasse().getId(), inscription.getAnnee_academic());
-        if (!existingInscriptions.isEmpty()) {
+        List<Inscription> etudiantParClasseEtAnnee = inscriptionRepository.findEtudiantParClasseEtAnnee(inscription.getClasse().getId(), inscription.getAnnee_academic());
+        if (!etudiantParClasseEtAnnee.isEmpty()) {
             throw new InscriptionNotFoundException("Un étudiant est déjà inscrit dans la même classe la même année");
         }
 
         //Vérifier si montant verser est conforme
         int somme = inscription.getClasse().getMontant_inscription()+inscription.getClasse().getAutre_frais()+inscription.getClasse().getAutre_frais();
         if (inscription.getVersement() < somme) {
-            throw new ClasseNotFoundException("Un étudiant doit verser au minimun une "+somme+" pour pouvoir s'inscrire");
+            throw new MontantVerseeNotFoundException("Un étudiant doit verser au minimun une "+somme+" pour pouvoir s'inscrire");
         }
 
         // Enregistrement de la photo
@@ -65,6 +63,12 @@ public class InscriptionService implements IInscription {
                 throw new RuntimeException("Impossible de lire le fichier de la photo");
             }
         }*/
+
+        // Validation du format de l'année académique
+        String anneeAcademic = inscription.getAnnee_academic();
+        if (!anneeAcademic.matches("\\d{4}-\\d{4}")) {
+            throw new AnneeAcademiqueNotFound("Le format de l'année académique est incorrect");
+        }
 
         return inscriptionRepository.save(inscription);
     }

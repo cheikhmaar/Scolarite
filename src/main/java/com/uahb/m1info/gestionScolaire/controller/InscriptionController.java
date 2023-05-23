@@ -21,8 +21,6 @@ public class InscriptionController {
     private IInscription inscriptionService;
     @Autowired
     private InscriptionRepository inscriptionRepository;
-    @Autowired
-    private ClasseRepository classeRepository;
 
     @GetMapping
     @ResponseBody
