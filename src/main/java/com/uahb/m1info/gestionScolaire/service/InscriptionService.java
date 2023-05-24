@@ -7,8 +7,10 @@ import com.uahb.m1info.gestionScolaire.repository.EtudiantRepository;
 import com.uahb.m1info.gestionScolaire.repository.InscriptionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 
+import java.io.IOException;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.Period;
@@ -22,17 +24,17 @@ public class InscriptionService implements IInscription {
     private InscriptionRepository inscriptionRepository;
     @Autowired
     private EtudiantRepository etudiantRepository;
-    @Autowired
-    private ClasseRepository classeRepository;
+
     @Override
     public Inscription save(Inscription inscription) {
+        // Vérification de l'inscription à partir de la matricule
         /*Optional<Etudiant> existingEtudiant = etudiantRepository.findByMatricule(inscription.getEtudiant().getMatricule());
         if (existingEtudiant.isPresent()) {
                 inscription.setEtudiant(existingEtudiant.get());
                 throw new RuntimeException("L'étudiant avec le matricule " + inscription.getEtudiant().getMatricule() + " existe déjà");
         }*/
 
-        //Vérification du l'age de l'etudiant
+        // Vérification du l'age de l'etudiant
         Date taDate = inscription.getEtudiant().getDate_naissance();
         Instant instant = taDate.toInstant();
         LocalDate date = instant.atZone(ZoneId.systemDefault()).toLocalDate();
@@ -40,7 +42,6 @@ public class InscriptionService implements IInscription {
         if (age < 16) {
             throw new EtudiantNotFoundException("L'étudiant doit avoir au moins 16 ans pour s'inscrire.");
         }
-
 
         // Vérification de l'inscription dans la même classe la même année
         List<Inscription> etudiantParClasseEtAnnee = inscriptionRepository.findEtudiantParClasseEtAnnee(inscription.getClasse().getId(), inscription.getAnnee_academic());
@@ -54,10 +55,11 @@ public class InscriptionService implements IInscription {
             throw new MontantVerseeNotFoundException("Un étudiant doit verser au minimun une "+somme+" pour pouvoir s'inscrire");
         }
 
-        // Enregistrement de la photo
-        /*byte[] photo = inscription.getEtudiant().getPhoto();
-        if (photo != null) {
+        /*// Enregistrement de la photo
+        MultipartFile photoFile = inscription.getEtudiant().getPhotoFile();
+        if (photoFile != null && !photoFile.isEmpty()) {
             try {
+                byte[] photo = photoFile.getBytes();
                 inscription.getEtudiant().setPhoto(photo);
             } catch (IOException e) {
                 throw new RuntimeException("Impossible de lire le fichier de la photo");
@@ -70,11 +72,25 @@ public class InscriptionService implements IInscription {
             throw new AnneeAcademiqueNotFound("Le format de l'année académique est incorrect");
         }
 
+        // Validation du nom qui contient des lettres et espaces
+        String nom = inscription.getEtudiant().getNom();
+        String regex = "^[a-zA-Z\\s]+$";
+        if (!nom.matches(regex)) {
+            throw new NomPrenomNotFound("Le nom ne doit contenir que des lettres et des espaces");
+        }
+
+        // Validation du prenom qui contient des lettres et espaces
+        String prenom = inscription.getEtudiant().getPrenom();
+        String regex1 = "^[a-zA-Z\\s]+$";
+        if (!prenom.matches(regex1)) {
+            throw new NomPrenomNotFound("Le prénom ne doit contenir que des lettres et des espaces");
+        }
+
         return inscriptionRepository.save(inscription);
     }
 
     @Override
-    public List<Inscription>  find() {
+    public List<Inscription> find() {
         return inscriptionRepository.findAll();
     }
 

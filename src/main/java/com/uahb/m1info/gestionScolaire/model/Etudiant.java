@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -33,7 +34,10 @@ public class Etudiant implements Serializable {
     @Column(length = 50)
     private String adresse;
     @Lob
+    @Column
     private byte[] photo;
+    /*@Transient
+    private MultipartFile photoFile;*/
     @JsonIgnore
     @OneToMany(mappedBy = "etudiant")
     private List<Inscription> inscriptions;

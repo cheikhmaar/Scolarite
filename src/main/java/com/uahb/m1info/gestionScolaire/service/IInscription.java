@@ -1,6 +1,5 @@
 package com.uahb.m1info.gestionScolaire.service;
 
-import com.uahb.m1info.gestionScolaire.model.Classe;
 import com.uahb.m1info.gestionScolaire.model.Inscription;
 
 import java.util.List;
