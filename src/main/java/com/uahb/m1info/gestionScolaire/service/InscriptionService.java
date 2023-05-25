@@ -2,7 +2,6 @@ package com.uahb.m1info.gestionScolaire.service;
 
 import com.uahb.m1info.gestionScolaire.exception.*;
 import com.uahb.m1info.gestionScolaire.model.Inscription;
-import com.uahb.m1info.gestionScolaire.repository.ClasseRepository;
 import com.uahb.m1info.gestionScolaire.repository.EtudiantRepository;
 import com.uahb.m1info.gestionScolaire.repository.InscriptionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,7 +9,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 
-import java.io.IOException;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.Period;
@@ -22,8 +20,6 @@ import java.util.List;
 public class InscriptionService implements IInscription {
     @Autowired
     private InscriptionRepository inscriptionRepository;
-    @Autowired
-    private EtudiantRepository etudiantRepository;
 
     @Override
     public Inscription save(Inscription inscription) {
@@ -111,11 +107,15 @@ public class InscriptionService implements IInscription {
         // Convertir la première lettre du prénom en majuscule
         String adresse = inscription.getEtudiant().getAdresse();
         adresse = adresse.substring(0, 1).toUpperCase() + adresse.substring(1);
+        // Convertir la première lettre du libelle en majuscule
+        String libelle = inscription.getClasse().getLibelle();
+        libelle = libelle.substring(0, 1).toUpperCase() + libelle.substring(1);
 
         // Mettre à jour les valeurs dans l'objet "Etudiant"
         inscription.getEtudiant().setNom(nom);
         inscription.getEtudiant().setPrenom(prenom);
         inscription.getEtudiant().setAdresse(adresse);
+        inscription.getClasse().setLibelle(libelle);
         return inscriptionRepository.save(inscription);
     }
 
