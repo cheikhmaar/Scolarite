@@ -19,13 +19,13 @@ public class Classe implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(length = 20)
+    @Column(length = 20, nullable = false)
     private String libelle;
-    @Column (length = 10)
+    @Column (length = 10, nullable = false)
     private int montant_inscription;
-    @Column (length = 10)
+    @Column (length = 10, nullable = false)
     private int mensualite;
-    @Column (length = 10)
+    @Column (length = 10, nullable = false)
     private int autre_frais;
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "filiere_id")

@@ -72,20 +72,50 @@ public class InscriptionService implements IInscription {
             throw new AnneeAcademiqueNotFound("Le format de l'année académique est incorrect");
         }
 
+        // Extraction des années de début et de fin
+        String[] annees = anneeAcademic.split("-");
+        int anneeDebut = Integer.parseInt(annees[0]);
+        int anneeFin = Integer.parseInt(annees[1]);
+
+        // Vérification de l'intervalle de temps
+        if (anneeFin - anneeDebut != 1) {
+            throw new AnneeAcademiqueNotFound("L'intervalle de temps de l'année académique doit être d'un an");
+        }
+
         // Validation du nom qui contient des lettres et espaces
         String nom = inscription.getEtudiant().getNom();
+        // Convertir la première lettre du nom en majuscule
+        nom = nom.substring(0, 1).toUpperCase() + nom.substring(1);
+        // Mettre à jour les valeurs dans l'objet "Etudiant"
         String regex = "^[a-zA-Z\\s]+$";
         if (!nom.matches(regex)) {
-            throw new NomPrenomNotFound("Le nom ne doit contenir que des lettres et des espaces");
+            throw new NomPrenomNotTelFoundException("Le nom ne doit contenir que des lettres et des espaces");
         }
 
         // Validation du prenom qui contient des lettres et espaces
         String prenom = inscription.getEtudiant().getPrenom();
+        // Convertir la première lettre du prénom en majuscule
+        prenom = prenom.substring(0, 1).toUpperCase() + prenom.substring(1);
         String regex1 = "^[a-zA-Z\\s]+$";
         if (!prenom.matches(regex1)) {
-            throw new NomPrenomNotFound("Le prénom ne doit contenir que des lettres et des espaces");
+            throw new NomPrenomNotTelFoundException("Le prénom ne doit contenir que des lettres et des espaces");
         }
 
+        // Validation du tel qui ne contient pas des lettres
+        String tel = inscription.getEtudiant().getTel();
+        String regex2 = "^(\\+221|0)([ \\-_/]*)(\\d[ \\-_/]*){9}$";
+        if (!tel.matches(regex2)) {
+            throw new NomPrenomNotTelFoundException("Le numéro de téléphone ne doit contenir que des chiffres");
+        }
+
+        // Convertir la première lettre du prénom en majuscule
+        String adresse = inscription.getEtudiant().getAdresse();
+        adresse = adresse.substring(0, 1).toUpperCase() + adresse.substring(1);
+
+        // Mettre à jour les valeurs dans l'objet "Etudiant"
+        inscription.getEtudiant().setNom(nom);
+        inscription.getEtudiant().setPrenom(prenom);
+        inscription.getEtudiant().setAdresse(adresse);
         return inscriptionRepository.save(inscription);
     }
 

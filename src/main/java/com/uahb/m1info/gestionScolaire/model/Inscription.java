@@ -15,7 +15,7 @@ public class Inscription implements Serializable {
     @Temporal(TemporalType.DATE)
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date date_inscription;
-    @Column(length = 10)
+    @Column(length = 10, nullable = false)
     private String annee_academic;
     @Column (length = 10, nullable = false)
     private int versement;

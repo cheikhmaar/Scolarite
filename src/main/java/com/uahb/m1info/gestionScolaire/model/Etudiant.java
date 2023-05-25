@@ -29,9 +29,11 @@ public class Etudiant implements Serializable {
     @Temporal(TemporalType.DATE)
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date date_naissance;
+    @Column(length = 20, nullable = false)
+    private String tel;
     @Column(length = 50, nullable = false)
     private String email;
-    @Column(length = 50)
+    @Column(length = 50, nullable = false)
     private String adresse;
     @Lob
     @Column
